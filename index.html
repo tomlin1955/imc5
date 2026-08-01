@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IMC 國際工商經營研究社</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <style>
+    :root {
+      --primary-color: #003366;
+      --secondary-color: #0066cc;
+    }
+
+    body {
+      background-color: #f8f9fa;
+      color: #333;
+    }
+
+    .navbar-dark-custom {
+      background-color: var(--primary-color);
+    }
+
+    /* 輪播圖圖片高度 */
+    .carousel-item {
+      height: 380px;
+      background-color: #000;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .carousel-item img {
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.8;
+    }
+
+    .carousel-caption {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 0.8rem 1rem;
+      border-radius: 6px;
+      backdrop-filter: blur(2px);
+      bottom: 1rem;
+      left: 5%;
+      right: 5%;
+    }
+
+    .carousel-caption h4 {
+      font-size: 1.2rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .carousel-caption p {
+      font-size: 0.85rem;
+      margin-bottom: 0;
+    }
+
+    /* 右側一欄兩列資訊方塊樣式 */
+    .side-info-card {
+      height: calc(190px - 0.5rem); /* 兩塊相加剛好等高於輪播圖 (380px) */
+      border: none;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border-radius: 8px;
+    }
+
+    .side-info-card .card-header {
+      background-color: #fff;
+      border-bottom: 2px solid var(--secondary-color);
+      font-weight: bold;
+      color: var(--primary-color);
+      padding: 0.5rem 1rem;
+    }
+
+    .side-info-card .list-group-item {
+      padding: 0.4rem 0.75rem;
+      font-size: 0.875rem;
+      border: none;
+      border-bottom: 1px dashed #eee;
+    }
+
+    .side-info-card .list-group-item:last-child {
+      border-bottom: none;
+    }
+
+    @media (max-width: 991px) {
+      .carousel-item {
+        height: 280px;
+      }
+      .side-info-card {
+        height: auto;
+      }
+    }
+
+    .section-title {
+      color: var(--primary-color);
+      border-bottom: 3px solid var(--secondary-color);
+      display: inline-block;
+      padding-bottom: 0.3rem;
+      margin-bottom: 1.5rem;
+      font-weight: bold;
+    }
+
+    .card-custom {
+      border: none;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card-custom:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-primary-custom {
+      background-color: var(--secondary-color);
+      border-color: var(--secondary-color);
+      color: white;
+    }
+
+    .btn-primary-custom:hover {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      color: white;
+    }
+
+    footer {
+      background-color: var(--primary-color);
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 頂部導覽列 -->
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-dark-custom sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="#">IMC 國際工商經營研究社</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" href="#" onclick="switchZone('public')">首頁開放區</a>
+          </li>
+          <li class="nav-item"><a class="nav-link" href="#about">關於 IMC</a></li>
+          <li class="nav-item"><a class="nav-link" href="#join">成為會員</a></li>
+          <li class="nav-item"><a class="nav-link" href="#committees">委員會佈達</a></li>
+          <li class="nav-item"><a class="nav-link" href="#news">工商趨勢</a></li>
+        </ul>
+        <button class="btn btn-danger btn-sm rounded-pill px-3" onclick="switchZone('member')">
+          <i class="bi bi-person-circle me-1"></i> IMC Store 會員專區
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主要內容區塊 -->
+  <main>
+
+    <!-- ================= 1. 全站開放區 ================= -->
+    <div id="public-zone">
+
+      <!-- 首頁英雄區：左側 2/3 輪播圖 + 右側 1/3 一欄兩列資訊方塊 -->
+      <div class="container my-4">
+        <div class="row g-3">
+          
+          <!-- 左側 2/3 (col-lg-8): 輪播圖片 (後台可管理最多 5 張) -->
+          <div class="col-lg-8">
+            <div id="homeBannerCarousel" class="carousel slide rounded shadow-sm" data-bs-ride="carousel" data-bs-interval="4000">
+              <div class="carousel-indicators">
+                <button type="button" data-bs-target="#homeBannerCarousel" data-bs-slide-to="0" class="active"></button>
+                <button type="button" data-bs-target="#homeBannerCarousel" data-bs-slide-to="1"></button>
+                <button type="button" data-bs-target="#homeBannerCarousel" data-bs-slide-to="2"></button>
+                <button type="button" data-bs-target="#homeBannerCarousel" data-bs-slide-to="3"></button>
+                <button type="button" data-bs-target="#homeBannerCarousel" data-bs-slide-to="4"></button>
+              </div>
+
+              <div class="carousel-inner">
+                <div class="carousel-item active">
+                  <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1200&q=80" class="d-block w-100" alt="高階管理學程">
+                  <div class="carousel-caption">
+                    <h4 class="fw-bold">高階工商管理學程研討</h4>
+                    <p>凝聚企業菁英共識，提升企業經營競爭力與前瞻視野。</p>
+                  </div>
+                </div>
+                <div class="carousel-item">
+                  <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80" class="d-block w-100" alt="國際論壇">
+                  <div class="carousel-caption">
+                    <h4 class="fw-bold">跨國商務交流與年會</h4>
+                    <p>連結全球產經趨勢，創造企業間深度的跨界合作平台。</p>
+                  </div>
+                </div>
+                <div class="carousel-item">
+                  <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=80" class="d-block w-100" alt="科技創新">
+                  <div class="carousel-caption">
+                    <h4 class="fw-bold">AI 與數位轉型實務應用</h4>
+                    <p>掌握最新科技發展趨勢，助您引領企業進行智慧轉型。</p>
+                  </div>
+                </div>
+                <div class="carousel-item">
+                  <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80" class="d-block w-100" alt="團隊領導">
+                  <div class="carousel-caption">
+                    <h4 class="fw-bold">團隊領導與組織永續</h4>
+                    <p>培養優秀領導人才，推動企業永續發展。</p>
+                  </div>
+                </div>
+                <div class="carousel-item">
+                  <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80" class="d-block w-100" alt="產業參訪">
+                  <div class="carousel-caption">
+                    <h4 class="fw-bold">標竿企業實地參訪與交流</h4>
+                    <p>深入標竿企業學習成功經驗，擴展企業家視野。</p>
+                  </div>
+                </div>
+              </div>
+
+              <button class="carousel-control-prev" type="button" data-bs-target="#homeBannerCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#homeBannerCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 右側 1/3 (col-lg-4): 一欄兩列資訊方塊 (後台可動態管理) -->
+          <div class="col-lg-4 d-flex flex-column justify-content-between gap-2">
+            
+            <!-- 上列：協會最新活動 -->
+            <div class="card side-info-card">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-calendar-check me-1 text-primary"></i> 協會最新活動</span>
+                <a href="#committees" class="text-decoration-none small text-muted">更多 <i class="bi bi-chevron-right"></i></a>
+              </div>
+              <ul class="list-group list-group-flush overflow-hidden">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <a href="#" class="text-truncate text-dark text-decoration-none me-2">【研討會】2026 企業 AI 轉型實務論壇</a>
+                  <span class="badge bg-danger rounded-pill">熱烈報名</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <a href="#" class="text-truncate text-dark text-decoration-none me-2">【參訪】九月標竿企業參訪：科技廠巡禮</a>
+                  <span class="badge bg-primary rounded-pill">新上架</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <a href="#" class="text-truncate text-dark text-decoration-none me-2">【月例會】高階管理經驗交流分享餐會</a>
+                  <span class="text-muted small">09/15</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- 下列：重大資訊公告 -->
+            <div class="card side-info-card">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-megaphone me-1 text-danger"></i> 重大資訊公告</span>
+                <a href="#news" class="text-decoration-none small text-muted">更多 <i class="bi bi-chevron-right"></i></a>
+              </div>
+              <ul class="list-group list-group-flush overflow-hidden">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <a href="#" class="text-truncate text-dark text-decoration-none me-2">【重要】2026 全國 IMC 聯合年會報名須知</a>
+                  <span class="text-muted small">08/01</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <a href="#" class="text-truncate text-dark text-decoration-none me-2">【公告】第 50 屆理監事改選結果揭曉</a>
+                  <span class="text-muted small">07/28</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <a href="#" class="text-truncate text-dark text-decoration-none me-2">【通知】IMC Store 會員系統升級維護說明</a>
+                  <span class="text-muted small">07/20</span>
+                </li>
+              </ul>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 頁面其餘內容 -->
+      <div class="container my-5">
+        
+        <!-- 關於 IMC -->
+        <section id="about" class="mb-5">
+          <h2 class="h3 section-title">關於 IMC</h2>
+          <div class="row g-4">
+            <div class="col-md-4">
+              <div class="card h-100 card-custom p-3">
+                <div class="card-body">
+                  <h5 class="card-title text-primary"><i class="bi bi-clock-history me-2"></i>成立起源 & 歷史紀事</h5>
+                  <p class="card-text text-muted">介紹 IMC 創社精神、經營理念與發展里程碑。</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card h-100 card-custom p-3">
+                <div class="card-body">
+                  <h5 class="card-title text-primary"><i class="bi bi-book me-2"></i>教育基金</h5>
+                  <p class="card-text text-muted">致力於推動工商教育與人才培育，基金會設立宗旨與運作說明。</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card h-100 card-custom p-3">
+                <div class="card-body">
+                  <h5 class="card-title text-primary"><i class="bi bi-diagram-3 me-2"></i>組織架構與理監事</h5>
+                  <p class="card-text text-muted">完善的組織運作架構與現任理監事團隊成員名單。</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 成為會員 -->
+        <section id="join" class="mb-5">
+          <h2 class="h3 section-title">成為會員</h2>
+          <div class="row g-4">
+            <div class="col-md-6">
+              <div class="card card-custom p-3 border-start border-4 border-primary">
+                <div class="card-body">
+                  <h5 class="card-title text-primary"><i class="bi bi-file-earmark-person me-2"></i>線上填表入會</h5>
+                  <p class="card-text text-muted">歡迎各界工商菁英加入，點擊下方按鈕即可於彈出視窗中填寫申請資料。</p>
+                  <button class="btn btn-primary-custom" data-bs-toggle="modal" data-bs-target="#formModal" onclick="switchFormTab('join')">
+                    <i class="bi bi-pencil-square me-1"></i> 立即線上報名
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card card-custom p-3 border-start border-4 border-info">
+                <div class="card-body">
+                  <h5 class="card-title text-info"><i class="bi bi-headset me-2"></i>專人聯絡諮詢</h5>
+                  <p class="card-text text-muted">對入會有任何疑問？可留下您的聯絡方式，秘書處將安排專人與您聯繫。</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 委員會資訊佈達 -->
+        <section id="committees" class="mb-5">
+          <h2 class="h3 section-title">委員會資訊佈達</h2>
+          <div class="row g-4">
+            <div class="col-md-4">
+              <div class="card h-100 card-custom p-3">
+                <div class="card-body d-flex flex-column justify-content-between">
+                  <div>
+                    <h5 class="card-title text-primary"><i class="bi bi-calendar-event me-2"></i>秘書處重要活動</h5>
+                    <p class="card-text text-muted">聯合會最新消息公告、大型年會與跨社交流活動通知。</p>
+                  </div>
+                  <div>
+                    <button class="btn btn-outline-primary btn-sm mt-3" data-bs-toggle="modal" data-bs-target="#formModal" onclick="switchFormTab('event')">
+                      <i class="bi bi-ticket-perforated me-1"></i> 活動線上報名
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card h-100 card-custom p-3">
+                <div class="card-body">
+                  <h5 class="card-title text-primary"><i class="bi bi-award me-2"></i>工經委員會</h5>
+                  <p class="card-text text-muted">提供專業學程、高階管理課程培訓與企業合作案。</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card h-100 card-custom p-3">
+                <div class="card-body">
+                  <h5 class="card-title text-primary"><i class="bi bi-lightbulb me-2"></i>創新委員會</h5>
+                  <p class="card-text text-muted">分享創新新知、產業突破案例與會員得獎榮譽榜。</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 重要發佈 -->
+        <section id="news" class="mb-5">
+          <h2 class="h3 section-title">IMC 重要發佈</h2>
+          <div class="row g-4">
+            <div class="col-md-4">
+              <div class="card h-100 card-custom p-3">
+                <div class="card-body">
+                  <h5 class="card-title"><i class="bi bi-newspaper me-2"></i>工商重要議題</h5>
+                  <p class="card-text text-muted">聚焦產經動態、政府政策與最新法規。</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card h-100 card-custom p-3">
+                <div class="card-body">
+                  <h5 class="card-title"><i class="bi bi-cpu me-2"></i>科技新知</h5>
+                  <p class="card-text text-muted">掌握 AI、數位轉型與新創科技發展趨勢。</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card h-100 card-custom p-3">
+                <div class="card-body">
+                  <h5 class="card-title"><i class="bi bi-globe me-2"></i>國際要聞</h5>
+                  <p class="card-text text-muted">透視全球經濟走勢與國際市場最新動態。</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- ================= 2. IMC Store 會員專區 ================= -->
+    <div id="member-zone" class="container my-5 d-none">
+      <div class="p-5 mb-4 bg-light rounded-3 shadow-sm text-center">
+        <h1 class="display-6 fw-bold text-primary"><i class="bi bi-shield-lock me-2"></i>IMC Store 會員專屬服務平台</h1>
+        <p class="lead text-muted">歡迎登入，享有課程報名、內部資料下載與全台 IMC 資源對接服務。</p>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="card card-custom p-3">
+            <div class="card-body">
+              <h5 class="card-title text-primary"><i class="bi bi-person-gear me-2"></i>1. 會員帳號管理</h5>
+              <ul class="list-unstyled mt-3">
+                <li class="mb-2"><a href="#" class="text-decoration-none text-secondary">• 個人資料維護</a></li>
+                <li class="mb-2"><a href="#" class="text-decoration-none text-secondary">• 企業名片與資訊更新</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card card-custom p-3">
+            <div class="card-body">
+              <h5 class="card-title text-primary"><i class="bi bi-folder-symlink me-2"></i>2. 專屬活動與資源</h5>
+              <ul class="list-unstyled mt-3">
+                <li class="mb-2"><a href="#" class="text-decoration-none text-secondary">• 工經委員會參訪資料</a></li>
+                <li class="mb-2"><a href="#" class="text-decoration-none text-secondary">• 數位圖書館影音課程</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card card-custom p-3">
+            <div class="card-body">
+              <h5 class="card-title text-primary"><i class="bi bi-bank me-2"></i>3. 系統連結與財務</h5>
+              <ul class="list-unstyled mt-3">
+                <li class="mb-2"><a href="#" class="text-decoration-none text-secondary">• 連結至 IMC 資訊 3.0</a></li>
+                <li class="mb-2"><a href="#" class="text-decoration-none text-secondary">• 財務報告與捐款紀錄</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= 彈出視窗 (Bootstrap Modal) ================= -->
+  <div class="modal fade" id="formModal" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        
+        <div class="modal-header bg-light flex-column align-items-stretch pb-0">
+          <div class="d-flex justify-content-between align-items-center w-100 mb-2">
+            <h5 class="modal-title fw-bold text-primary" id="formModalLabel">線上申辦與報名</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          
+          <ul class="nav nav-tabs border-bottom-0" id="formTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active fw-bold" id="join-tab" data-bs-toggle="tab" data-bs-target="#modal-join-pane" type="button" role="tab">
+                📝 入會申請線上填表
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link fw-bold" id="event-tab" data-bs-toggle="tab" data-bs-target="#modal-event-pane" type="button" role="tab">
+                🎟️ 委員會與活動線上報名
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <div class="modal-body p-4">
+          <div id="modalAlert" class="alert d-none" role="alert"></div>
+
+          <div class="tab-content" id="formTabContent">
+            
+            <!-- FORM 1: 成為會員表單 -->
+            <div class="tab-pane fade show active" id="modal-join-pane" role="tabpanel">
+              <form id="joinModalForm" onsubmit="submitForm(event, 'join')">
+                <h6 class="text-primary fw-bold mb-3"><i class="bi bi-person-fill me-1"></i> 基本個人資料</h6>
+                <div class="row g-3 mb-3">
+                  <div class="col-md-6">
+                    <label class="form-label">中文姓名 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="name" required placeholder="請輸入完整姓名">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">性別 <span class="text-danger">*</span></label>
+                    <select class="form-select" name="gender" required>
+                      <option value="">-- 請選擇 --</option>
+                      <option value="male">男</option>
+                      <option value="female">女</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">行動電話 <span class="text-danger">*</span></label>
+                    <input type="tel" class="form-control" name="phone" required placeholder="0912345678" pattern="^09\d{8}$">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">電子郵件 Email <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control" name="email" required placeholder="example@domain.com">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">擬加入之 IMC 分社 <span class="text-danger">*</span></label>
+                    <select class="form-select" name="chapter" required>
+                      <option value="">-- 請選擇地區分社 --</option>
+                      <option value="taipei">台北市 IMC</option>
+                      <option value="newtaipei">新北市 IMC</option>
+                      <option value="taoyuan">桃園市 IMC</option>
+                      <option value="taichung">台中市 IMC</option>
+                      <option value="tainan">台南市 IMC</option>
+                      <option value="kaohsiung">高雄市 IMC</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">出生年月日</label>
+                    <input type="date" class="form-control" name="birthday">
+                  </div>
+                </div>
+
+                <h6 class="text-primary fw-bold mb-3"><i class="bi bi-building me-1"></i> 企業與專業背景</h6>
+                <div class="row g-3 mb-3">
+                  <div class="col-md-6">
+                    <label class="form-label">服務企業名稱 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="company" required placeholder="例如：○○科技股份有限公司">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">職稱 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="job_title" required placeholder="例如：董事長 / 總經理">
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label">附件上傳 (名片/簡介 PDF, JPG)</label>
+                    <input type="file" class="form-control" name="attachment" accept=".pdf,.png,.jpg,.jpeg">
+                  </div>
+                </div>
+
+                <div class="form-check mb-4">
+                  <input class="form-check-input" type="checkbox" name="agree" id="modalAgree" required>
+                  <label class="form-check-label" for="modalAgree">
+                    我已閱讀並同意個資保護告知事項 <span class="text-danger">*</span>
+                  </label>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                  <button type="submit" class="btn btn-primary-custom px-4">送出申請</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- FORM 2: 活動報名表單 -->
+            <div class="tab-pane fade" id="modal-event-pane" role="tabpanel">
+              <form id="eventModalForm" onsubmit="submitForm(event, 'register')">
+                <div class="row g-3 mb-3">
+                  <div class="col-12">
+                    <label class="form-label">選擇欲報名的活動 / 課程 <span class="text-danger">*</span></label>
+                    <select class="form-select" name="event_id" required>
+                      <option value="">-- 請選擇活動名稱 --</option>
+                      <option value="mgt-101">工經委員會 - 現代企業經營高階管理學程</option>
+                      <option value="inn-ai">創新委員會 - AI 產業轉型實務應用</option>
+                      <option value="int-forum">國際委員會 - 亞太工商經營交流會</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">報名人姓名 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="name" required placeholder="請輸入姓名">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">聯絡電話 <span class="text-danger">*</span></label>
+                    <input type="tel" class="form-control" name="phone" required placeholder="0912345678" pattern="^09\d{8}$">
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label">電子郵件 Email <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control" name="email" required placeholder="example@domain.com">
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                  <button type="submit" class="btn btn-primary-custom px-4">確認報名</button>
+                </div>
+              </form>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- 頁尾 -->
+  <footer class="py-4 mt-auto">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <h5>IMC 國際工商經營研究社</h5>
+          <p class="small mb-0">電話：(02) 1234-5678 | Email：service@imc.org.tw</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <p class="small mb-0"><a href="#" class="text-white me-2">全省各 IMC 社網站</a> | <a href="#" class="text-white ms-2">IMC 資訊 3.0</a></p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    function switchZone(zone) {
+      if (zone === 'public') {
+        document.getElementById('public-zone').classList.remove('d-none');
+        document.getElementById('member-zone').classList.add('d-none');
+      } else {
+        document.getElementById('public-zone').classList.add('d-none');
+        document.getElementById('member-zone').classList.remove('d-none');
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function switchFormTab(type) {
+      const alertBox = document.getElementById('modalAlert');
+      alertBox.classList.add('d-none');
+
+      if (type === 'join') {
+        const tab = new bootstrap.Tab(document.getElementById('join-tab'));
+        tab.show();
+      } else {
+        const tab = new bootstrap.Tab(document.getElementById('event-tab'));
+        tab.show();
+      }
+    }
+
+    function submitForm(event, action) {
+      event.preventDefault();
+      const form = event.target;
+      const formData = new FormData(form);
+      const alertBox = document.getElementById('modalAlert');
+
+      fetch(`api.php?action=${action}`, {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        alertBox.classList.remove('d-none', 'alert-danger', 'alert-success');
+        if (data.code === 200 || data.code === 201) {
+          alertBox.classList.add('alert-success');
+          alertBox.innerText = data.message || '資料提交成功！';
+          form.reset();
+        } else {
+          alertBox.classList.add('alert-danger');
+          alertBox.innerText = data.message || '提交失敗，請檢查輸入內容。';
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alertBox.classList.remove('d-none', 'alert-success');
+        alertBox.classList.add('alert-danger');
+        alertBox.innerText = '系統連線異常，請稍後再試。';
+      });
+    }
+  </script>
+</body>
+</html>
