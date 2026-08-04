@@ -132,65 +132,82 @@
   </style>
 </head>
 
-  <!-- 💡 先在網頁中加入一個用來裝自訂通知的容器（放在 script 上方即可） -->
-<div id="custom-toast" style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: none; background-color: #28a745; color: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-family: sans-serif; font-weight: bold; transition: all 0.3s ease;"></div>
-
-<!-- 💡 先在網頁中加入一個用來裝自訂通知的容器（放在 script 上方即可） -->
-<div id="custom-toast" style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: none; background-color: #28a745; color: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-family: sans-serif; font-weight: bold; transition: all 0.3s ease;"></div>
-
-<script>
+ <script>
 function submitForm(event, type) {
-    event.preventDefault(); 
+    event.preventDefault(); // 阻止網頁跳轉刷新
 
     if (type === 'join') {
         const form = document.getElementById('joinModalForm');
+        if (!form) return;
+        
         const formData = new FormData(form);
 
         fetch('api.php?action=join', { 
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('網路回應不成功');
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
-                // 1. 立刻將原本填資料的彈出視窗關閉
+                // 1. 立刻關閉原本填資料的 Bootstrap 彈出視窗
                 const modalElement = form.closest('.modal');
                 if (modalElement) {
-                    const modalInstance = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
-                    modalInstance.hide();
+                    const modalInstance = (typeof bootstrap !== 'undefined' && bootstrap.Modal)
+                        ? (bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement))
+                        : null;
+                    if (modalInstance) modalInstance.hide();
                 }
                 
                 // 2. 清空表單欄位
                 form.reset(); 
 
-                // 3. 將告示訊息獨立出來，顯示在網頁右上角的獨立通知框中
-                const toast = document.getElementById('custom-toast');
-                toast.innerText = '🎉 ' + data.message;
-                toast.style.backgroundColor = '#28a745'; // 成功用綠色
-                toast.style.display = 'block';
-                toast.style.opacity = '1';
-
-                // 4. 停留 2 秒（2000毫秒）後，自動讓告示訊息消失
-                setTimeout(() => {
-                    toast.style.opacity = '0';
-                    setTimeout(() => { toast.style.display = 'none'; }, 300); // 完全隱藏
-                }, 2000);
+                // 3. 執行方案 A：獨立動態在網頁右上角建立漂亮的浮動通知
+                showFloatingToast('🎉 ' + data.message, '#28a745');
                 
             } else {
-                // 失敗時的獨立通知（用紅色）
-                const toast = document.getElementById('custom-toast');
-                toast.innerText = '❌ 申請失敗：' + data.message;
-                toast.style.backgroundColor = '#dc3545'; 
-                toast.style.display = 'block';
-                toast.style.opacity = '1';
-                setTimeout(() => { toast.style.opacity = '0'; }, 3000);
+                // 伺服器回傳註冊失敗（如手機重複）的獨立通知（用紅色）
+                showFloatingToast('❌ 申請失敗：' + data.message, '#dc3545');
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            alert('❌ 連線發生錯誤，請稍後再試！');
+            console.error('詳細錯誤資訊:', error);
+            alert('❌ 連線發生錯誤，原因：' + error.message);
         });
     }
+}
+
+// 💡 方案 A 的核心：免動 HTML，由 JS 自動建立網頁右上角通知
+function showFloatingToast(message, bgColor) {
+    const toast = document.createElement('div');
+    toast.innerText = message;
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 99999;
+        background-color: ${bgColor};
+        color: white;
+        padding: 15px 25px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        font-family: sans-serif;
+        font-weight: bold;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    `;
+    document.body.appendChild(toast);
+    
+    // 讓通知淡入顯示
+    setTimeout(() => { toast.style.opacity = '1'; }, 50);
+
+    // 停留 2 秒後自動淡出並徹底移除該元件
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => { toast.remove(); }, 300);
+    }, 2000);
 }
 </script>
 請謹慎使用程式碼。方案 B：直接在原本網頁的畫面上方插一條「置頂告示列」如果你不希望通知出現在右上角，而是希望在原本彈出視窗關掉後，網頁最上方（Header 下方）多出一行醒目的提示，2 秒後自動隱藏，可以使用這個方案：將 <script> 替換為以下程式碼（同樣會先關視窗，再獨立顯示訊息）：html<!-- 💡 放在網頁最外層、最上方的獨立告示區塊 -->
