@@ -136,58 +136,110 @@
 <div id="custom-toast" style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: none; background-color: #28a745; color: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-family: sans-serif; font-weight: bold; transition: all 0.3s ease;"></div>
 
 <script>
+// 💡 1. 改用「純 JS 萬用切換法」，徹底繞過 Bootstrap JS 核心報錯
+function switchFormTab(targetTabId) {
+    // A. 處理內容面板 (Tab Pane) 的顯示與隱藏
+    const targetPane = document.getElementById(targetTabId);
+    if (targetPane) {
+        // 找到同層級所有的 tab-pane，先全部關閉
+        const allPanes = targetPane.parentNode.querySelectorAll('.tab-pane');
+        allPanes.forEach(pane => {
+            pane.classList.remove('show', 'active');
+        });
+        // 只讓目標面板亮起來
+        targetPane.classList.add('show', 'active');
+    }
+
+    // B. 處理上方按鈕標籤 (Tab Button) 的亮起狀態（選填，確保樣式同步切換）
+    const allTabs = document.querySelectorAll('[data-bs-toggle="tab"], [data-bs-toggle="pill"]');
+    allTabs.forEach(tab => {
+        const targetAttr = tab.getAttribute('data-bs-target') || tab.getAttribute('href');
+        if (targetAttr === `#${targetTabId}`) {
+            tab.classList.add('active');
+            tab.setAttribute('aria-selected', 'true');
+        } else {
+            tab.classList.remove('active');
+            tab.setAttribute('aria-selected', 'false');
+        }
+    });
+}
+
+// 💡 2. 核心表單送出功能（方案 A 右上角通知）
 function submitForm(event, type) {
     event.preventDefault(); 
 
     if (type === 'join') {
         const form = document.getElementById('joinModalForm');
+        if (!form) return;
+        
         const formData = new FormData(form);
 
         fetch('api.php?action=join', { 
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('網路回應不成功');
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
-                // 1. 立刻將原本填資料的彈出視窗關閉
+                // 1. 立刻關閉原本填資料的 Bootstrap 彈出視窗
                 const modalElement = form.closest('.modal');
                 if (modalElement) {
-                    const modalInstance = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
-                    modalInstance.hide();
+                    // 使用純 JS 的最安全方式移除 Bootstrap 的 show 樣式與背景遮罩
+                    modalElement.classList.remove('show');
+                    modalElement.style.display = 'none';
+                    document.body.classList.remove('modal-open');
+                    document.body.style.overflow = '';
+                    const backdrop = document.querySelector('.modal-backdrop');
+                    if (backdrop) backdrop.remove();
                 }
                 
                 // 2. 清空表單欄位
                 form.reset(); 
 
-                // 3. 將告示訊息獨立出來，顯示在網頁右上角的獨立通知框中
-                const toast = document.getElementById('custom-toast');
-                toast.innerText = '🎉 ' + data.message;
-                toast.style.backgroundColor = '#28a745'; // 成功用綠色
-                toast.style.display = 'block';
-                toast.style.opacity = '1';
-
-                // 4. 停留 2 秒（2000毫秒）後，自動讓告示訊息消失
-                setTimeout(() => {
-                    toast.style.opacity = '0';
-                    setTimeout(() => { toast.style.display = 'none'; }, 300); // 完全隱藏
-                }, 2000);
+                // 3. 獨立動態在網頁右上角建立漂亮的浮動通知
+                showFloatingToast('🎉 ' + data.message, '#28a745');
                 
             } else {
-                // 失敗時的獨立通知（用紅色）
-                const toast = document.getElementById('custom-toast');
-                toast.innerText = '❌ 申請失敗：' + data.message;
-                toast.style.backgroundColor = '#dc3545'; 
-                toast.style.display = 'block';
-                toast.style.opacity = '1';
-                setTimeout(() => { toast.style.opacity = '0'; }, 3000);
+                showFloatingToast('❌ 申請失敗：' + data.message, '#dc3545');
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            alert('❌ 連線發生錯誤，請稍後再試！');
+            console.error('詳細錯誤資訊:', error);
+            alert('❌ 連線發生錯誤，原因：' + error.message);
         });
     }
+}
+
+// 💡 3. 獨立的浮動通知產生器（方案 A）
+function showFloatingToast(message, bgColor) {
+    const toast = document.createElement('div');
+    toast.innerText = message;
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 99999;
+        background-color: ${bgColor};
+        color: white;
+        padding: 15px 25px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        font-family: sans-serif;
+        font-weight: bold;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => { toast.style.opacity = '1'; }, 50);
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => { toast.remove(); }, 300);
+    }, 2000);
 }
 </script>
 請謹慎使用程式碼。方案 B：直接在原本網頁的畫面上方插一條「置頂告示列」如果你不希望通知出現在右上角，而是希望在原本彈出視窗關掉後，網頁最上方（Header 下方）多出一行醒目的提示，2 秒後自動隱藏，可以使用這個方案：將 <script> 替換為以下程式碼（同樣會先關視窗，再獨立顯示訊息）：html<!-- 💡 放在網頁最外層、最上方的獨立告示區塊 -->
