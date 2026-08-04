@@ -131,7 +131,40 @@
     }
   </style>
 </head>
-<body>
+
+  <script>
+function submitForm(event, type) {
+    event.preventDefault(); // 阻止原本的 HTML 網頁跳轉刷新
+
+    if (type === 'join') {
+        const form = document.getElementById('joinModalForm');
+        const formData = new FormData(form); // 自動打包表單內所有欄位與上傳的檔案
+
+        // 使用 fetch 將資料送到後端的 register.php
+        fetch('register.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json()) // 預期後端傳回 JSON 格式的結果
+        .then(data => {
+            if (data.success) {
+                alert('🎉 ' + data.message);
+                form.reset(); // 清空表單
+                // 如果你有使用 Bootstrap Modal 彈窗，可以在這裡用程式碼把它關閉
+                // bootstrap.Modal.getInstance(document.getElementById('你的ModalID')).hide();
+            } else {
+                alert('❌ 申請失敗：' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('❌ 連線發生錯誤，請稍後再試！');
+        });
+    }
+}
+</script>
+  
+  <body>
 
   <!-- 頂部導覽列 -->
   <nav class="navbar navbar-expand-lg navbar-dark navbar-dark-custom sticky-top">
