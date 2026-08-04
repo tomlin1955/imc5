@@ -132,28 +132,55 @@
   </style>
 </head>
 
-  <script>
+  <!-- 💡 先在網頁中加入一個用來裝自訂通知的容器（放在 script 上方即可） -->
+<div id="custom-toast" style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: none; background-color: #28a745; color: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-family: sans-serif; font-weight: bold; transition: all 0.3s ease;"></div>
+
+<script>
 function submitForm(event, type) {
-    event.preventDefault(); // 阻止原本的 HTML 網頁跳轉刷新
+    event.preventDefault(); 
 
     if (type === 'join') {
         const form = document.getElementById('joinModalForm');
-        const formData = new FormData(form); // 自動打包表單內所有欄位與上傳的檔案
+        const formData = new FormData(form);
 
-        // 使用 fetch 將資料送到後端的 register.php
-        fetch('register.php', {
+        fetch('api.php?action=join', { 
             method: 'POST',
             body: formData
         })
-        .then(response => response.json()) // 預期後端傳回 JSON 格式的結果
+        .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('🎉 ' + data.message);
-                form.reset(); // 清空表單
-                // 如果你有使用 Bootstrap Modal 彈窗，可以在這裡用程式碼把它關閉
-                // bootstrap.Modal.getInstance(document.getElementById('你的ModalID')).hide();
+                // 1. 立刻將原本填資料的彈出視窗關閉
+                const modalElement = form.closest('.modal');
+                if (modalElement) {
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+                    modalInstance.hide();
+                }
+                
+                // 2. 清空表單欄位
+                form.reset(); 
+
+                // 3. 將告示訊息獨立出來，顯示在網頁右上角的獨立通知框中
+                const toast = document.getElementById('custom-toast');
+                toast.innerText = '🎉 ' + data.message;
+                toast.style.backgroundColor = '#28a745'; // 成功用綠色
+                toast.style.display = 'block';
+                toast.style.opacity = '1';
+
+                // 4. 停留 2 秒（2000毫秒）後，自動讓告示訊息消失
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    setTimeout(() => { toast.style.display = 'none'; }, 300); // 完全隱藏
+                }, 2000);
+                
             } else {
-                alert('❌ 申請失敗：' + data.message);
+                // 失敗時的獨立通知（用紅色）
+                const toast = document.getElementById('custom-toast');
+                toast.innerText = '❌ 申請失敗：' + data.message;
+                toast.style.backgroundColor = '#dc3545'; 
+                toast.style.display = 'block';
+                toast.style.opacity = '1';
+                setTimeout(() => { toast.style.opacity = '0'; }, 3000);
             }
         })
         .catch(error => {
