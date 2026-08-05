@@ -132,108 +132,8 @@
   </style>
 </head>
 
-<script>
-// 💡 1. 萬用純 JS 切換功能，手動為按鈕與面板切換樣式
-function switchFormTab(targetTabId) {
-    if (window.event) window.event.preventDefault();
 
-    // A. 切換內容面板
-    const targetPane = document.getElementById(targetTabId);
-    if (targetPane) {
-        const allPanes = targetPane.parentNode.querySelectorAll('.tab-pane');
-        allPanes.forEach(pane => pane.classList.remove('show', 'active'));
-        targetPane.classList.add('show', 'active');
-    }
 
-    // B. 同步切換按鈕的 active 藍色高亮狀態
-    const allTabs = document.querySelectorAll('[onclick^="switchFormTab"]');
-    allTabs.forEach(tab => {
-        if (tab.getAttribute('onclick').includes(targetTabId)) {
-            tab.classList.add('active');
-        } else {
-            tab.classList.remove('active');
-        }
-    });
-}
-
-// 💡 2. 核心表單送出功能（方案 A 右上角通知）
-function submitForm(event, type) {
-    event.preventDefault(); 
-
-    if (type === 'join') {
-        const form = document.getElementById('joinModalForm');
-        if (!form) return;
-        
-        const formData = new FormData(form);
-
-        fetch('api.php?action=join', { 
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (!response.ok) throw new Error('網路回應不成功');
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                // 立刻關閉原本填資料的 Bootstrap 彈出視窗
-                const modalElement = form.closest('.modal');
-                if (modalElement) {
-                    modalElement.classList.remove('show');
-                    modalElement.style.display = 'none';
-                    document.body.classList.remove('modal-open');
-                    document.body.style.overflow = '';
-                    const backdrop = document.querySelector('.modal-backdrop');
-                    if (backdrop) backdrop.remove();
-                }
-                
-                // 清空表單欄位
-                form.reset(); 
-
-                // 獨立動態在網頁右上角建立漂亮的浮動通知
-                showFloatingToast('🎉 ' + data.message, '#28a745');
-                
-            } else {
-                showFloatingToast('❌ 申請失敗：' + data.message, '#dc3545');
-            }
-        })
-        .catch(error => {
-            console.error('詳細錯誤資訊:', error);
-            alert('❌ 連線發生錯誤，原因：' + error.message);
-        });
-    }
-}
-
-// 💡 3. 獨立的浮動通知產生器（方案 A）
-function showFloatingToast(message, bgColor) {
-    const toast = document.createElement('div');
-    toast.innerText = message;
-    toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 99999;
-        background-color: ${bgColor};
-        color: white;
-        padding: 15px 25px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        font-family: sans-serif;
-        font-weight: bold;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    `;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => { toast.style.opacity = '1'; }, 50);
-
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        setTimeout(() => { toast.remove(); }, 300);
-    }, 2000);
-}
-</script>
-  
   <body>
 
   <!-- 頂部導覽列 -->
@@ -720,59 +620,110 @@ function showFloatingToast(message, bgColor) {
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    function switchZone(zone) {
-      if (zone === 'public') {
-        document.getElementById('public-zone').classList.remove('d-none');
-        document.getElementById('member-zone').classList.add('d-none');
-      } else {
-        document.getElementById('public-zone').classList.add('d-none');
-        document.getElementById('member-zone').classList.remove('d-none');
-      }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+// 💡 1. 萬用純 JS 切換功能
+function switchFormTab(targetTabId) {
+    if (window.event) window.event.preventDefault();
+
+    const targetPane = document.getElementById(targetTabId);
+    if (targetPane) {
+        const allPanes = targetPane.parentNode.querySelectorAll('.tab-pane');
+        allPanes.forEach(pane => pane.classList.remove('show', 'active'));
+        targetPane.classList.add('show', 'active');
     }
 
-    function switchFormTab(type) {
-      const alertBox = document.getElementById('modalAlert');
-      alertBox.classList.add('d-none');
-
-      if (type === 'join') {
-        const tab = new bootstrap.Tab(document.getElementById('join-tab'));
-        tab.show();
-      } else {
-        const tab = new bootstrap.Tab(document.getElementById('event-tab'));
-        tab.show();
-      }
-    }
-
-    function submitForm(event, action) {
-      event.preventDefault();
-      const form = event.target;
-      const formData = new FormData(form);
-      const alertBox = document.getElementById('modalAlert');
-
-      fetch(`api.php?action=${action}`, {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => response.json())
-      .then(data => {
-        alertBox.classList.remove('d-none', 'alert-danger', 'alert-success');
-        if (data.code === 200 || data.code === 201) {
-          alertBox.classList.add('alert-success');
-          alertBox.innerText = data.message || '資料提交成功！';
-          form.reset();
+    const allTabs = document.querySelectorAll('[onclick^="switchFormTab"]');
+    allTabs.forEach(tab => {
+        if (tab.getAttribute('onclick').includes(targetTabId)) {
+            tab.classList.add('active');
         } else {
-          alertBox.classList.add('alert-danger');
-          alertBox.innerText = data.message || '提交失敗，請檢查輸入內容。';
+            tab.classList.remove('active');
         }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alertBox.classList.remove('d-none', 'alert-success');
-        alertBox.classList.add('alert-danger');
-        alertBox.innerText = '系統連線異常，請稍後再試。';
-      });
+    });
+}
+
+// 💡 2. 核心表單送出功能（終極防卡死關閉視窗版）
+function submitForm(event, type) {
+    event.preventDefault(); 
+
+    if (type === 'join') {
+        const form = document.getElementById('joinModalForm');
+        if (!form) return;
+        
+        const formData = new FormData(form);
+
+        fetch('api.php?action=join', { 
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('網路回應不成功，狀態碼：' + response.status);
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // 🛠️ 【核心修正】強制清除所有 Bootstrap 彈出視窗的樣式與黑底遮罩，保證 100% 關閉
+                const openModals = document.querySelectorAll('.modal.show, .modal');
+                openModals.forEach(modal => {
+                    modal.classList.remove('show');
+                    modal.style.display = 'none';
+                    modal.setAttribute('aria-hidden', 'true');
+                    modal.removeAttribute('aria-modal');
+                    modal.removeAttribute('role');
+                });
+                
+                // 清除背後的半透明黑底遮罩 (Backdrop)
+                const backdrops = document.querySelectorAll('.modal-backdrop');
+                backdrops.forEach(backdrop => backdrop.remove());
+                
+                // 恢復網頁身體的滾動條，防止網頁卡死不能動
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+
+                // 清空表單欄位
+                form.reset(); 
+
+                // 獨立動態在網頁右上角建立漂亮的浮動通知（方案 A）
+                showFloatingToast('🎉 ' + data.message, '#28a745');
+            } else {
+                showFloatingToast('❌ 申請失敗：' + data.message, '#dc3545');
+            }
+        })
+        .catch(error => {
+            console.error('詳細錯誤資訊:', error);
+            alert('❌ 連線發生錯誤，原因：' + error.message);
+        });
     }
-  </script>
+}
+
+// 💡 3. 獨立的浮動通知產生器（方案 A）
+function showFloatingToast(message, bgColor) {
+    const toast = document.createElement('div');
+    toast.innerText = message;
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 99999;
+        background-color: ${bgColor};
+        color: white;
+        padding: 15px 25px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        font-family: sans-serif;
+        font-weight: bold;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => { toast.style.opacity = '1'; }, 50);
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => { toast.remove(); }, 300);
+    }, 2000);
+}
+</script>
 </body>
 </html>

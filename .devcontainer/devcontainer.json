@@ -1,0 +1,10 @@
+{
+  "name": "MySQL Dev Environment",
+  "image": "://microsoft.com",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:1": {}
+  },
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "forwardPorts": [3306]
+}
